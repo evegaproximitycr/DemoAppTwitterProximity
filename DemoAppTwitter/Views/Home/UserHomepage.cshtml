@@ -1,0 +1,114 @@
+﻿@using DemoAppTwitter.Models
+@model TwitterUserModel
+
+
+<h2>Twitter User @Model.user.ScreenName</h2>
+
+
+
+
+<div id="spinner">
+    
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading panel-head">Post a Tweet</div>
+    <div class="panel-body">
+        <label>Tweet:</label><input type="text" id="txtTweet" name="txtTweet" maxlength="140" size="250"/>
+        <input type="button" id="btnSubmitTweet" class="btn btn-warning" style="height:35px;width:120px" value="Post" />
+    </div>
+    <div id="target">
+        @{ Html.RenderAction("LoadTweets");}
+    </div>
+
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading panel-head">Search a Place</div>
+    <div class="panel-body">
+        <label>Place Id:</label><input type="text" id="txtPlaceId" name="txtPlaceId" maxlength="50" size="250"/>
+        <input type="button" id="btnSubmitPlace" class="btn btn-warning" style="height:35px;width:120px" value="Search" />
+    </div>
+    <div id="targetPlace">
+        @{ Html.RenderAction("SearchPlace");}
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading panel-head">Search Popular</div>
+    <div class="panel-body">
+        <table>
+            <tr>
+                <td>
+                    <label>Twitter User:</label><input type="text" id="txtTwitterUser" name="txtTwitterUser" maxlength="50" size="150" />
+                </td>
+                <td>
+                    <label>HashTag #</label><input type="text" id="txtHashTag" name="txtHashTag" maxlength="50" size="150" />
+                </td>
+                <td>
+                    <label>&nbsp;</label><input type="button" id="btnSubmitPopular" class="btn btn-warning" style="height:35px;width:120px" value="Search" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="targetPopular">
+        @{ Html.RenderAction("PopularTweets");}
+    </div>
+</div>
+
+@section Scripts {
+<script src="/Scripts/jquery-1.10.2.js"></script>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnSubmitTweet').click(function () {
+                $.ajax({
+                    url: '@Url.Action("LoadTweets", "Home")',
+                    data: { tweet: $("#txtTweet").val() },
+                    type: 'POST',
+                    success: function (data) {
+                        $("#txtTweet").val("");
+                        $("#target").html(data);
+                    }
+                });
+            });
+
+            $('#btnSubmitPlace').click(function () {
+                $.ajax({
+                    url: '@Url.Action("SearchPlace", "Home")',
+                    data: { placeId: $("#txtPlaceId").val() },
+                    type: 'POST',
+                    success: function (data) {
+                        $("#txtPlaceId").val("");
+                        $("#targetPlace").html(data);
+                    }
+                });
+            });
+
+            $('#btnSubmitPopular').click(function () {
+                var url = "user=" + $("#txtTwitterUser").val() + "&" + "tag=" + $("#txtHashTag").val();
+                var _user = $("#txtTwitterUser").val() ;
+                var _tag = $("#txtHashTag").val();
+
+                $.ajax({
+                    url: '@Url.Action("PopularTweets", "Home")',
+                    data: { user:_user, tag:_tag},
+                    type: 'POST',
+                    success: function (data) {
+                        $("#txtTwitterUser").val("");
+                        $("#txtHashTag").val("");
+                        $("#targetPopular").html(data);
+                    }
+                });
+            });
+
+            $(document).ajaxStart(function () { $("#spinner").show(); })
+                           .ajaxStop(function () { $("#spinner").hide(); });
+
+        });
+
+    </script>
+}
